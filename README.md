@@ -1,1 +1,0 @@
-# doctrine-logger-bundle

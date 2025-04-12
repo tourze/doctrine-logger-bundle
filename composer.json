@@ -1,0 +1,28 @@
+{
+  "name": "tourze/doctrine-logger-bundle",
+  "description": "Doctrine Logger Bundle",
+  "license": "MIT",
+  "require": {
+    "php": "^8.1",
+    "doctrine/doctrine-bundle": "^2.13",
+    "doctrine/orm": "^2.17 || ^3.0",
+    "symfony/service-contracts": "^2.5 || ^3",
+    "symfony/framework-bundle": "^6.4",
+    "symfony/yaml": "^6.4 || ^7.1",
+    "symfony/stopwatch": "^6.4",
+    "symfony/doctrine-bridge": "^6.4",
+    "tourze/backtrace-helper": "0.0.*",
+    "psr/log": "^3|^2|^1"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tourze\\DoctrineLoggerBundle\\": "src"
+    }
+  },
+  "scripts": {
+    "phpstan": "phpstan analyse src -l 1"
+  }
+}
