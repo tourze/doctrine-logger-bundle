@@ -48,7 +48,7 @@ class LogStatement extends AbstractStatementMiddleware
     public function execute(): ResultInterface
     {
         $name = "{$this->timeLogger->getSequenceId()}. {$this->sql}";
-        return $this->timeLogger->watch($name, $this->sql, $params ?? $this->params, function () {
+        return $this->timeLogger->watch($name, $this->sql, $this->params, function () {
             return parent::execute();
         });
     }
