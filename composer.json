@@ -27,6 +27,11 @@
       "Tourze\\DoctrineLoggerBundle\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tourze\\DoctrineLoggerBundle\\Tests\\": "tests"
+    }
+  },
   "scripts": {
     "phpstan": "phpstan analyse src -l 1"
   }
