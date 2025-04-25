@@ -8,7 +8,6 @@ use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\Deprecations\Deprecation;
 use Tourze\DoctrineLoggerBundle\Service\QueryExecutionTimeLogger;
 
 class LogStatement extends AbstractStatementMiddleware
@@ -30,15 +29,6 @@ class LogStatement extends AbstractStatementMiddleware
 
     public function bindValue($param, $value, $type = ParameterType::STRING): void
     {
-        if (\func_num_args() < 3) {
-            Deprecation::trigger(
-                'doctrine/dbal',
-                'https://github.com/doctrine/dbal/pull/5558',
-                'Not passing $type to Statement::bindValue() is deprecated.'
-                    . ' Pass the type corresponding to the parameter being bound.',
-            );
-        }
-
         $this->params[$param] = $value;
         $this->types[$param] = $type;
 
