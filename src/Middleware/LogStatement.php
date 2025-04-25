@@ -45,7 +45,7 @@ class LogStatement extends AbstractStatementMiddleware
         parent::bindValue($param, $value, $type);
     }
 
-    public function execute($params = null): ResultInterface
+    public function execute(): ResultInterface
     {
         $name = "{$this->timeLogger->getSequenceId()}. {$this->sql}";
 
