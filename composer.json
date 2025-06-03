@@ -23,7 +23,7 @@
     "symfony/service-contracts": "^3.5",
     "symfony/stopwatch": "^6.4",
     "symfony/yaml": "^6.4 || ^7.1",
-    "tourze/backtrace-helper": "~0.0.5",
+    "tourze/backtrace-helper": "0.1.*",
     "yiisoft/strings": "^2.1"
   },
   "require-dev": {
