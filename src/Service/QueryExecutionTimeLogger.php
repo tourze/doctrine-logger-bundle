@@ -40,8 +40,8 @@ class QueryExecutionTimeLogger implements ResetInterface
 
     public function getSequenceId(): string
     {
-        static::$sequenceNumber++;
-        return (string) static::$sequenceNumber;
+        self::$sequenceNumber++;
+        return (string) self::$sequenceNumber;
     }
 
     public function watch(string $name, string $sql, array|null $params, callable $callback): mixed
