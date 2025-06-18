@@ -71,6 +71,8 @@ class DoctrineLoggerBundleIntegrationTest extends TestCase
         $id1 = $this->timeLogger->getSequenceId();
         $id2 = $this->timeLogger->getSequenceId();
 
+        $this->assertIsString($id1);
+        $this->assertIsString($id2);
         $this->assertNotEquals($id1, $id2);
     }
 

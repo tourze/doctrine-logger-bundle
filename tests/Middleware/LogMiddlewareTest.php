@@ -42,4 +42,14 @@ class LogMiddlewareTest extends TestCase
         $this->middleware->reset();
     }
 
+    /**
+     * 获取私有属性值的辅助方法
+     */
+    private function getPrivateProperty(object $object, string $propertyName)
+    {
+        $reflection = new \ReflectionClass($object);
+        $property = $reflection->getProperty($propertyName);
+        $property->setAccessible(true);
+        return $property->getValue($object);
+    }
 }
