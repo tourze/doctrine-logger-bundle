@@ -38,7 +38,7 @@ class LogConnection extends AbstractConnectionMiddleware
 
     public function prepare(string $sql): DriverStatement
     {
-        if ($this->transactionIds) {
+        if (!empty($this->transactionIds)) {
             $startTime = microtime(true);
             $statement = parent::prepare($sql);
             $endTime = microtime(true);
@@ -67,7 +67,7 @@ class LogConnection extends AbstractConnectionMiddleware
 
     public function query(string $sql): Result
     {
-        if ($this->transactionIds) {
+        if (!empty($this->transactionIds)) {
             $startTime = microtime(true);
             $result = parent::query($sql);
             $endTime = microtime(true);
@@ -91,7 +91,7 @@ class LogConnection extends AbstractConnectionMiddleware
 
     public function exec(string $sql): int
     {
-        if ($this->transactionIds) {
+        if (!empty($this->transactionIds)) {
             $startTime = microtime(true);
             $result = parent::exec($sql);
             $endTime = microtime(true);
