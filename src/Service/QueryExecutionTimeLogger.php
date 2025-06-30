@@ -14,7 +14,7 @@ use Yiisoft\Strings\StringHelper;
 /**
  * 统计SQL执行效率
  */
-#[AutoconfigureTag('as-coroutine')]
+#[AutoconfigureTag(name: 'as-coroutine')]
 class QueryExecutionTimeLogger implements ResetInterface
 {
     public const MAX_STRING_LENGTH = 32;
