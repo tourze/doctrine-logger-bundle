@@ -14,7 +14,7 @@ use Tourze\DoctrineLoggerBundle\Service\QueryExecutionTimeLogger;
 class LogConnection extends AbstractConnectionMiddleware
 {
     /**
-     * @var array 记录事务长度
+     * @var array<string> 记录事务ID
      */
     private array $transactionIds = [];
 
@@ -38,7 +38,7 @@ class LogConnection extends AbstractConnectionMiddleware
 
     public function prepare(string $sql): DriverStatement
     {
-        if (!empty($this->transactionIds)) {
+        if ([] !== $this->transactionIds) {
             $startTime = microtime(true);
             $statement = parent::prepare($sql);
             $endTime = microtime(true);
@@ -67,7 +67,7 @@ class LogConnection extends AbstractConnectionMiddleware
 
     public function query(string $sql): Result
     {
-        if (!empty($this->transactionIds)) {
+        if ([] !== $this->transactionIds) {
             $startTime = microtime(true);
             $result = parent::query($sql);
             $endTime = microtime(true);
@@ -89,9 +89,9 @@ class LogConnection extends AbstractConnectionMiddleware
         });
     }
 
-    public function exec(string $sql): int
+    public function exec(string $sql): int|string
     {
-        if (!empty($this->transactionIds)) {
+        if ([] !== $this->transactionIds) {
             $startTime = microtime(true);
             $result = parent::exec($sql);
             $endTime = microtime(true);
@@ -129,7 +129,9 @@ class LogConnection extends AbstractConnectionMiddleware
             parent::commit();
         } finally {
             $id = array_pop($this->transactionIds);
-            $this->timeLogger->checkEvent($this->stopwatch->stop($id), ['transactionId' => $id], $this->queries);
+            if (null !== $id) {
+                $this->timeLogger->checkEvent($this->stopwatch->stop($id), ['transactionId' => $id], $this->queries);
+            }
             $this->queries = [];
         }
     }
@@ -140,7 +142,9 @@ class LogConnection extends AbstractConnectionMiddleware
             parent::rollBack();
         } finally {
             $id = array_pop($this->transactionIds);
-            $this->timeLogger->checkEvent($this->stopwatch->stop($id), ['transactionId' => $id]);
+            if (null !== $id) {
+                $this->timeLogger->checkEvent($this->stopwatch->stop($id), ['transactionId' => $id]);
+            }
             $this->queries = [];
         }
     }

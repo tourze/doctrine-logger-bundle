@@ -6,5 +6,3 @@ services:
 
   Tourze\DoctrineLoggerBundle\Service\:
     resource: '../../Service/'
-
-  Tourze\DoctrineLoggerBundle\Middleware\LogMiddleware: ~

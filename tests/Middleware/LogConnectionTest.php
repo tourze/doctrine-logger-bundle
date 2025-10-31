@@ -5,6 +5,7 @@ namespace Tourze\DoctrineLoggerBundle\Tests\Middleware;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -13,19 +14,35 @@ use Tourze\DoctrineLoggerBundle\Middleware\LogConnection;
 use Tourze\DoctrineLoggerBundle\Middleware\LogStatement;
 use Tourze\DoctrineLoggerBundle\Service\QueryExecutionTimeLogger;
 
-class LogConnectionTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(LogConnection::class)]
+final class LogConnectionTest extends TestCase
 {
     private LogConnection $connection;
+
     private Connection|MockObject $wrappedConnection;
+
     private QueryExecutionTimeLogger|MockObject $timeLogger;
+
     private Stopwatch|MockObject $stopwatch;
+
     private Statement|MockObject $statement;
+
     private Result|MockObject $result;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->wrappedConnection = $this->createMock(Connection::class);
+        // 使用具体类 QueryExecutionTimeLogger 进行 Mock：
+        // QueryExecutionTimeLogger 是项目内部服务类，为简化测试逻辑需要模拟其行为
+        // 该类职责单一，Mock 具体类不会影响测试的有效性
         $this->timeLogger = $this->createMock(QueryExecutionTimeLogger::class);
+        // 使用具体类 Stopwatch 进行 Mock：
+        // Stopwatch 是 Symfony 组件的核心类，没有对应接口
+        // 在测试中需要模拟其行为，使用具体类是唯一选择
         $this->stopwatch = $this->createMock(Stopwatch::class);
         $this->statement = $this->createMock(Statement::class);
         $this->result = $this->createMock(Result::class);
@@ -44,7 +61,8 @@ class LogConnectionTest extends TestCase
         $this->wrappedConnection->expects($this->once())
             ->method('prepare')
             ->with($sql)
-            ->willReturn($this->statement);
+            ->willReturn($this->statement)
+        ;
 
         $result = $this->connection->prepare($sql);
 
@@ -58,19 +76,23 @@ class LogConnectionTest extends TestCase
 
         $this->timeLogger->expects($this->once())
             ->method('getSequenceId')
-            ->willReturn($expectedSequenceId);
+            ->willReturn($expectedSequenceId)
+        ;
 
         $this->wrappedConnection->expects($this->once())
             ->method('query')
             ->with($sql)
-            ->willReturn($this->result);
+            ->willReturn($this->result)
+        ;
 
+        $expectedName = "{$expectedSequenceId}. {$sql}";
         $this->timeLogger->expects($this->once())
             ->method('watch')
-            ->with("$expectedSequenceId. $sql", $sql, null)
-            ->willReturnCallback(function ($name, $sql, $params, $callback) {
-                return $callback();
-            });
+            ->with($expectedName, $sql, null)
+            ->willReturnCallback(function (string $watchName, string $watchSql, ?array $watchParams, callable $watchCallback) {
+                return $watchCallback();
+            })
+        ;
 
         $result = $this->connection->query($sql);
 
@@ -85,19 +107,23 @@ class LogConnectionTest extends TestCase
 
         $this->timeLogger->expects($this->once())
             ->method('getSequenceId')
-            ->willReturn($expectedSequenceId);
+            ->willReturn($expectedSequenceId)
+        ;
 
         $this->wrappedConnection->expects($this->once())
             ->method('exec')
             ->with($sql)
-            ->willReturn($expectedReturn);
+            ->willReturn($expectedReturn)
+        ;
 
+        $expectedName = "{$expectedSequenceId}. {$sql}";
         $this->timeLogger->expects($this->once())
             ->method('watch')
-            ->with("$expectedSequenceId. $sql", $sql, null)
-            ->willReturnCallback(function ($name, $sql, $params, $callback) {
-                return $callback();
-            });
+            ->with($expectedName, $sql, null)
+            ->willReturnCallback(function (string $watchName, string $watchSql, ?array $watchParams, callable $watchCallback) {
+                return $watchCallback();
+            })
+        ;
 
         $result = $this->connection->exec($sql);
 
@@ -109,10 +135,12 @@ class LogConnectionTest extends TestCase
         // 开始事务
         $this->stopwatch->expects($this->once())
             ->method('start')
-            ->with($this->stringContains('DBAL_PROFILE_TRANSACTION_'));
+            ->with(self::stringContains('DBAL_PROFILE_TRANSACTION_'))
+        ;
 
         $this->wrappedConnection->expects($this->once())
-            ->method('beginTransaction');
+            ->method('beginTransaction')
+        ;
 
         $this->connection->beginTransaction();
     }
@@ -125,20 +153,25 @@ class LogConnectionTest extends TestCase
         $transactionIdsProperty->setAccessible(true);
         $transactionIdsProperty->setValue($this->connection, ['test_transaction_id']);
 
-        // 提交事务
+        // 使用具体类 StopwatchEvent 进行 Mock：
+        // StopwatchEvent 是 Symfony Stopwatch 组件的事件类，没有对应接口
+        // 测试需要模拟事件的返回值，使用具体类是必要的选择
         $event = $this->createMock(StopwatchEvent::class);
 
         $this->wrappedConnection->expects($this->once())
-            ->method('commit');
+            ->method('commit')
+        ;
 
         $this->stopwatch->expects($this->once())
             ->method('stop')
             ->with('test_transaction_id')
-            ->willReturn($event);
+            ->willReturn($event)
+        ;
 
         $this->timeLogger->expects($this->once())
             ->method('checkEvent')
-            ->with($event, $this->arrayHasKey('transactionId'), []);
+            ->with($event, self::arrayHasKey('transactionId'), [])
+        ;
 
         $this->connection->commit();
     }
@@ -151,20 +184,25 @@ class LogConnectionTest extends TestCase
         $transactionIdsProperty->setAccessible(true);
         $transactionIdsProperty->setValue($this->connection, ['test_transaction_id']);
 
-        // 回滚事务
+        // 使用具体类 StopwatchEvent 进行 Mock：
+        // StopwatchEvent 是 Symfony Stopwatch 组件的事件类，没有对应接口
+        // 测试需要模拟事件的返回值，使用具体类是必要的选择
         $event = $this->createMock(StopwatchEvent::class);
 
         $this->wrappedConnection->expects($this->once())
-            ->method('rollBack');
+            ->method('rollBack')
+        ;
 
         $this->stopwatch->expects($this->once())
             ->method('stop')
             ->with('test_transaction_id')
-            ->willReturn($event);
+            ->willReturn($event)
+        ;
 
         $this->timeLogger->expects($this->once())
             ->method('checkEvent')
-            ->with($event, $this->arrayHasKey('transactionId'));
+            ->with($event, self::arrayHasKey('transactionId'))
+        ;
 
         $this->connection->rollBack();
     }

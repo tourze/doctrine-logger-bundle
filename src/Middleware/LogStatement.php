@@ -35,7 +35,13 @@ class LogStatement extends AbstractStatementMiddleware
     {
         $name = "{$this->timeLogger->getSequenceId()}. {$this->sql}";
 
-        return $this->timeLogger->watch($name, $this->sql, $this->params, function () {
+        // 将参数转换为字符串键数组以匹配 watch() 方法的期望类型
+        $stringKeyParams = [];
+        foreach ($this->params as $key => $value) {
+            $stringKeyParams[(string) $key] = $value;
+        }
+
+        return $this->timeLogger->watch($name, $this->sql, $stringKeyParams, function () {
             return parent::execute();
         });
     }

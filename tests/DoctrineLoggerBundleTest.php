@@ -1,34 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\DoctrineLoggerBundle\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Tourze\BacktraceHelper\Backtrace;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\DoctrineLoggerBundle\DoctrineLoggerBundle;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractBundleTestCase;
 
-class DoctrineLoggerBundleTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(DoctrineLoggerBundle::class)]
+#[RunTestsInSeparateProcesses]
+final class DoctrineLoggerBundleTest extends AbstractBundleTestCase
 {
-    private DoctrineLoggerBundle $bundle;
-
-    protected function setUp(): void
-    {
-        $this->bundle = new DoctrineLoggerBundle();
-    }
-
-    public function testBoot(): void
-    {
-        // 在运行 boot 之前记录当前忽略文件的数量
-        $reflectionClass = new \ReflectionClass(Backtrace::class);
-        $prodIgnoreFilesProperty = $reflectionClass->getProperty('prodIgnoreFiles');
-        $prodIgnoreFilesProperty->setAccessible(true);
-
-        $ignoreFilesBefore = count($prodIgnoreFilesProperty->getValue());
-
-        // 运行 boot 方法
-        $this->bundle->boot();
-
-        // 验证是否添加了 3 个新的忽略文件
-        $ignoreFilesAfter = count($prodIgnoreFilesProperty->getValue());
-        $this->assertEquals($ignoreFilesBefore + 3, $ignoreFilesAfter);
-    }
 }

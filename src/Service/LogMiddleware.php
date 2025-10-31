@@ -1,23 +1,20 @@
 <?php
 
-namespace Tourze\DoctrineLoggerBundle\Middleware;
+namespace Tourze\DoctrineLoggerBundle\Service;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsMiddleware;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\Service\ResetInterface;
-use Tourze\DoctrineLoggerBundle\Service\QueryExecutionTimeLogger;
+use Tourze\DoctrineLoggerBundle\Middleware\LogDriver;
 
-#[AsMiddleware(connections: [
-    'default',
-    'session',
-])]
-class LogMiddleware implements Middleware, ResetInterface
+#[AsMiddleware]
+readonly class LogMiddleware implements Middleware, ResetInterface
 {
     public function __construct(
-        private readonly QueryExecutionTimeLogger $timeLogger,
-        private readonly Stopwatch $stopwatch,
+        private QueryExecutionTimeLogger $timeLogger,
+        private Stopwatch $stopwatch,
     ) {
     }
 
