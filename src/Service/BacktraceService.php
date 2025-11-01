@@ -13,7 +13,6 @@ class BacktraceService
 {
     public function createBacktraceString(): string
     {
-        // @phpstan-ignore-next-line 跨模块调用合理：BacktraceHelper是工具包，没有Service层
         return Backtrace::create()->toString();
     }
 }
